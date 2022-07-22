@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo List</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="./config.js"></script>
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body class="h-screen flex flex-col justify-center items-center">
+    <div class="bg-[#a683e3] px-4 py-2 rounded mb-10">
+      <h1 class="text-white font-bold text-3xl">Todo List</h1>
+    </div>
+    <section class="h-[350px] max-w-[95%] w-72 rounded bg-white p-4">
+      <ul id="ul" class="flex flex-col gap-2 h-4/5 mb-3 overflow-y-auto"></ul>
+      <div id="add-form" class="flex items-center gap-3">
+        <input
+          class="border-b-2 outline-none border-[#a683e3] flex-auto"
+          type="text"
+          id="add-input"
+          placeholder="Add todo"
+        />
+        <button id="save-btn" class="w-fit">
+          <img
+            src="./src/images/icons8-save-64.png"
+            alt="Save Button"
+            width="50"
+          />
+        </button>
+      </div>
+    </section>
+    <button id="clear-btn">
+      <img src="./src/images/icons8-empty-trash-100.png" alt="" />
+    </button>
+    <script src="./index.js"></script>
+  </body>
+</html>
