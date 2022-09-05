@@ -3,9 +3,23 @@ const addInput = document.getElementById('add-input');
 const saveBtn = document.getElementById('save-btn');
 const clearBtn = document.getElementById('clear-btn');
 
-let todoList = localStorage.getItem('todoList')
-  ? stringObjToArrayObj(localStorage.getItem('todoList'))
-  : [];
+// let todoList = localStorage.getItem('todoList')
+//   ? stringObjToArrayObj(localStorage.getItem('todoList'))
+//   : [];
+const url =
+  'https://crudcrud.com/api/53ef30c155524469aa325eb6de128f8a/todolist';
+function getDataFromServer() {
+  return fetch(url)
+    .then((res) => res.json())
+    .catch((error) => {
+      console.log(error);
+    });
+}
+
+let todoList = getDataFromServer().then((data) => {
+  todoList = data;
+  renderTodo(todoList);
+});
 
 function createTodo(todo, i) {
   const li = document.createElement('li');
@@ -69,7 +83,18 @@ function renderTodo(todoList) {
     ul.appendChild(li);
   });
 }
-renderTodo(todoList);
+
+function addTodoToServer(todo) {
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(todo),
+  })
+    .then((res) => res.json())
+    .catch((e) => console.log(e));
+}
 
 addInput.addEventListener('keypress', (e) => {
   if (e.key !== 'Enter') return;
@@ -84,7 +109,7 @@ addInput.addEventListener('keypress', (e) => {
       todo.text = i == index ? value : todo.text;
       return todo;
     });
-
+    updateTodoFromServer(todoList[i]);
     input.classList.remove(`edit${i}`);
     input.value = '';
 
@@ -92,19 +117,41 @@ addInput.addEventListener('keypress', (e) => {
     renderTodo(todoList);
   } else {
     const todo = { check: false, text: value };
-    todoList.push(todo);
+    addTodoToServer(todo).then((data) => todoList.push(data));
     const li = createTodo(todo, todoList.length - 1);
     ul.appendChild(li);
     input.value = '';
   }
 });
 
+function deleteTodoFromServer(todo) {
+  return fetch(`${url}/${todo._id}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+}
+
 function deleteTodo(e, i) {
   const li = e.target.parentNode.parentNode;
   li.remove();
+  deleteTodoFromServer(todoList[i]);
   todoList = todoList.filter((v, index) => i != index);
 }
 
+function updateTodoFromServer(todo) {
+  return fetch(`${url}/${todo._id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      check: todo.check,
+      text: todo.text,
+    }),
+  }).catch((e) => console.log(e));
+}
 function doneTodo(e, i) {
   todoList = todoList.map((todo, index) => {
     if (index === i) {
@@ -114,6 +161,7 @@ function doneTodo(e, i) {
       return todo;
     }
   });
+  updateTodoFromServer(todoList[i]);
   ul.innerHTML = '';
   renderTodo(todoList);
 }
